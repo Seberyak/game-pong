@@ -1,0 +1,756 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+
+:root {
+    --primary-color: #4CAF50;
+    --secondary-color: #8BC34A;
+    --player-color: #FF5722;
+    --computer-color: #2196F3;
+    --dark-bg: rgba(0, 0, 0, 0.7);
+    --light-text: white;
+    --canvas-gradient-1: #000046;
+    --canvas-gradient-2: #1CB5E0;
+    --background-color: #1a1a2e;
+    --text-color: #e6e6e6;
+    --accent-color: #4361ee;
+    --ai-color: #f72585;
+    --ball-color: #ffd166;
+    --vh: 1vh;
+}
+
+@keyframes gradientBG {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes glow {
+    0% {
+        box-shadow: 0 0 5px var(--primary-color);
+    }
+    50% {
+        box-shadow: 0 0 20px var(--primary-color);
+    }
+    100% {
+        box-shadow: 0 0 5px var(--primary-color);
+    }
+}
+
+@keyframes textGlow {
+    0% {
+        text-shadow: 0 0 5px rgba(255, 255, 255, 0.7);
+    }
+    50% {
+        text-shadow: 0 0 20px rgba(255, 255, 255, 0.9);
+    }
+    100% {
+        text-shadow: 0 0 5px rgba(255, 255, 255, 0.7);
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+html, body {
+    height: 100%;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    position: fixed;
+    font-family: 'Press Start 2P', cursive;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+body {
+    background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Orbitron', sans-serif;
+    color: var(--light-text);
+}
+
+.game-container {
+    width: 900px;
+    max-width: 95vw;
+    height: calc(var(--vh, 1vh) * 90);
+    max-height: 800px;
+    min-height: 580px;
+    background-color: rgba(0, 0, 0, 0.7);
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+    margin: 0 auto;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+/* Menu System */
+.menu-screen {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    padding: 15px;
+    z-index: 10;
+    animation: fadeIn 0.3s ease;
+    overflow-y: auto;
+}
+
+.menu-screen.active {
+    display: flex;
+    z-index: 20;
+}
+
+.game-title {
+    font-size: 36px;
+    margin-bottom: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-weight: 700;
+    font-family: 'Press Start 2P', cursive;
+    animation: textGlow 3s infinite;
+    background: linear-gradient(to right, #FF5722, #FFC107, #8BC34A, #2196F3, #9C27B0);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-align: center;
+}
+
+.menu-title {
+    font-size: 24px;
+    margin-bottom: 20px;
+    text-align: center;
+    color: var(--light-text);
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.menu-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+    max-width: 250px;
+    margin-top: 20px;
+}
+
+.menu-button {
+    padding: 12px 20px;
+    background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+    color: var(--light-text);
+    border: none;
+    border-radius: 30px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-family: 'Orbitron', sans-serif;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.menu-button:hover, .menu-button:focus {
+    background: linear-gradient(to right, var(--secondary-color), var(--primary-color));
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Level Selection */
+.level-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin: 15px 0 20px;
+    width: 100%;
+    max-width: 280px;
+}
+
+.level-button {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(to bottom right, #2196F3, #03A9F4);
+    color: var(--light-text);
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    font-family: 'Orbitron', sans-serif;
+}
+
+.level-button:hover, .level-button:focus {
+    transform: scale(1.1);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Settings Menu */
+.settings-group {
+    width: 100%;
+    max-width: 300px;
+    margin-bottom: 20px;
+}
+
+.settings-group h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+    text-align: center;
+    color: #BBDEFB;
+}
+
+.setting-options {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.setting-option {
+    padding: 8px 16px;
+    background: rgba(33, 150, 243, 0.3);
+    color: var(--light-text);
+    border: 2px solid #2196F3;
+    border-radius: 20px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.setting-option:hover, .setting-option:focus {
+    background: rgba(33, 150, 243, 0.5);
+}
+
+.setting-option.active {
+    background: #2196F3;
+    box-shadow: 0 0 10px #2196F3;
+}
+
+.back-button {
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.2);
+    color: var(--light-text);
+    border: none;
+    border-radius: 20px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 15px;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.back-button:hover, .back-button:focus {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+/* Game Screen */
+#gameScreen {
+    overflow: hidden;
+    max-height: 100%;
+}
+
+#gameScreen.active {
+    z-index: 30;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    min-height: 580px;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 15px;
+    overflow: hidden;
+}
+
+.game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 2px;
+    padding: 0 10px;
+    z-index: 40;
+}
+
+.game-header .game-title {
+    font-size: 22px;
+    margin: 0;
+}
+
+#levelDisplay {
+    font-size: 14px;
+    color: #BBDEFB;
+    font-weight: bold;
+    min-width: 70px;
+}
+
+.icon-button.small {
+    width: 36px;
+    height: 36px;
+    font-size: 14px;
+}
+
+.score-labels {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0 15px;
+    font-size: 14px;
+    margin-top: 2px;
+    color: rgba(255, 255, 255, 0.8);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    z-index: 40;
+}
+
+.score-labels div:first-child {
+    color: var(--player-color);
+}
+
+.score-labels div:last-child {
+    color: var(--computer-color);
+}
+
+.score {
+    display: flex;
+    justify-content: space-between;
+    padding: 3px 15px;
+    font-size: 24px;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 4px;
+    margin-bottom: 5px;
+    font-weight: bold;
+    z-index: 40;
+}
+
+#playerScore, #computerScore {
+    transition: transform 0.2s;
+    min-width: 30px;
+    text-align: center;
+}
+
+#playerScore {
+    color: var(--player-color);
+}
+
+#computerScore {
+    color: var(--computer-color);
+}
+
+.score-animation {
+    animation: pulse 0.5s ease;
+}
+
+canvas {
+    background: linear-gradient(to right, var(--canvas-gradient-1), var(--canvas-gradient-2));
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    transition: transform 0.3s;
+    margin: 4px 0;
+    width: 100%;
+    max-width: 800px;
+    min-height: 350px;
+    max-height: calc(100% - 200px);
+    display: block;
+    z-index: 30;
+    aspect-ratio: 16/10;
+}
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 8px 0;
+    gap: 15px;
+    flex-wrap: wrap;
+    width: 100%;
+    z-index: 40;
+}
+
+#startButton {
+    padding: 8px 20px;
+    background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+    color: var(--light-text);
+    border: none;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    animation: glow 3s infinite;
+    font-family: 'Orbitron', sans-serif;
+    min-width: 140px;
+}
+
+#startButton:hover, #startButton:focus {
+    background: linear-gradient(to right, var(--secondary-color), var(--primary-color));
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.icon-button {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(to right, var(--player-color), #FF9800);
+    color: var(--light-text);
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s;
+    box-shadow: 0 0 10px rgba(255, 87, 34, 0.5);
+}
+
+.icon-button:hover, .icon-button:focus {
+    transform: scale(1.1);
+    box-shadow: 0 0 15px rgba(255, 87, 34, 0.7);
+}
+
+.controls-info {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    text-align: center;
+    color: #ffffff;
+    font-size: 16px;
+    line-height: 1.5;
+    z-index: 99;
+    width: 100%;
+    max-width: 600px;
+    padding: 8px 15px;
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+    position: relative;
+    bottom: 0;
+    left: 0;
+    visibility: visible !important;
+}
+
+.controls-info p {
+    margin: 3px 0;
+    font-weight: bold;
+    text-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
+    letter-spacing: 0.5px;
+}
+
+#gameScreen.active .controls-info {
+    position: relative;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 5px 15px;
+    margin-top: 2px;
+    margin-bottom: 0;
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    visibility: visible !important;
+}
+
+/* Tablet and larger screens */
+@media (min-width: 600px) {
+    .game-container {
+        padding: 20px;
+    }
+    
+    .game-title {
+        font-size: 42px;
+    }
+    
+    .menu-title {
+        font-size: 28px;
+    }
+    
+    .menu-button {
+        font-size: 18px;
+        padding: 12px 25px;
+    }
+    
+    .level-grid {
+        grid-template-columns: repeat(5, 1fr);
+        max-width: 350px;
+        gap: 12px;
+    }
+    
+    .level-button {
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+    }
+    
+    .game-header .game-title {
+        font-size: 26px;
+    }
+    
+    #levelDisplay {
+        font-size: 16px;
+    }
+    
+    .score-labels {
+        font-size: 16px;
+    }
+    
+    .score {
+        font-size: 28px;
+    }
+    
+    #startButton {
+        font-size: 16px;
+        padding: 10px 25px;
+    }
+    
+    .controls-info {
+        font-size: 14px;
+    }
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+    .game-container {
+        width: 900px;
+        max-height: 700px;
+    }
+    
+    .game-title {
+        font-size: 48px;
+        letter-spacing: 5px;
+    }
+    
+    .menu-title {
+        font-size: 32px;
+        margin-bottom: 30px;
+    }
+    
+    .menu-buttons {
+        max-width: 300px;
+    }
+    
+    .menu-button {
+        font-size: 20px;
+        padding: 15px 30px;
+    }
+    
+    canvas {
+        margin: 10px 0;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    .button-container {
+        margin: 20px 0;
+        gap: 20px;
+    }
+    
+    #startButton {
+        padding: 12px 30px;
+        font-size: 18px;
+        min-width: 180px;
+    }
+    
+    .icon-button {
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+    }
+    
+    .controls-info {
+        font-size: 16px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+        padding: 12px;
+    }
+}
+
+#menuButton {
+    min-width: 36px;
+    margin-left: auto;
+    background: linear-gradient(to right, #FF9800, #FF5722);
+    box-shadow: 0 0 10px rgba(255, 152, 0, 0.5);
+    z-index: 50;
+    position: relative;
+}
+
+#menuButton:hover, #menuButton:focus {
+    transform: scale(1.1);
+    box-shadow: 0 0 15px rgba(255, 152, 0, 0.7);
+}
+
+#gameScreen.active .game-title {
+    font-size: 20px;
+    margin: 0;
+    flex-grow: 1;
+    text-align: center;
+}
+
+@media (max-height: 700px) {
+    .controls-info {
+        padding: 3px 10px;
+        position: absolute;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90%;
+        z-index: 100;
+    }
+    
+    .controls-info p {
+        margin: 2px 0;
+        font-size: 14px;
+    }
+    
+    .button-container {
+        margin: 5px 0 40px 0;
+    }
+    
+    canvas {
+        margin: 3px 0;
+        max-height: calc(100% - 160px);
+    }
+}
+
+/* Mobile optimization */
+* {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
+    position: fixed;
+    font-family: 'Press Start 2P', cursive;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* Mobile controls */
+.mobile-controls {
+    display: none;
+    width: 100%;
+    padding: 10px 0;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.mobile-control-btn {
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    color: white;
+    border: none;
+    outline: none;
+}
+
+.mobile-control-btn:active {
+    background-color: rgba(255, 255, 255, 0.4);
+}
+
+@media (max-width: 768px) {
+    .mobile-controls {
+        display: flex;
+    }
+    
+    .controls-info {
+        display: none;
+    }
+    
+    .game-container {
+        padding-bottom: 80px;
+    }
+    
+    canvas {
+        touch-action: none;
+    }
+    
+    /* Mobile-specific title styling that works better across devices */
+    .game-title {
+        font-family: 'Press Start 2P', cursive;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+        /* Simpler styling for mobile that still looks good */
+        background: none;
+        -webkit-background-clip: initial;
+        background-clip: initial;
+        -webkit-text-fill-color: white;
+        text-shadow: 
+            0 0 10px #FF5722,
+            0 0 20px #FFC107,
+            0 0 30px #8BC34A,
+            0 0 40px #2196F3,
+            0 0 50px #9C27B0;
+        letter-spacing: 4px;
+    }
+}
+
+/* Extra font fallbacks for cross-platform compatibility */
+@font-face {
+    font-family: 'Press Start 2P';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url(https://fonts.gstatic.com/s/pressstart2p/v15/e3t4euO8T-267oIAQAu6jDQyK3nVivNm4I81.woff2) format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+} 

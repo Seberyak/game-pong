@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="description" content="A colorful Pong game with multiple difficulty levels and customization options">
+    <meta name="theme-color" content="#1a1a2e">
+    <link rel="manifest" href="manifest.json">
+    <!-- iOS specific icon -->
+    <link rel="apple-touch-icon" href="images/icon-192.png">
+    <title>Colorful Pong Game</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <main class="game-container">
+        <!-- Main Menu -->
+        <section id="mainMenu" class="menu-screen active" aria-label="Main Menu">
+            <h1 class="game-title">PONG</h1>
+            <div class="menu-buttons">
+                <button id="startMenuBtn" class="menu-button" aria-label="Start Game">Start Game</button>
+                <button id="settingsMenuBtn" class="menu-button" aria-label="Settings">Settings</button>
+            </div>
+        </section>
+
+        <!-- Level Selection Menu -->
+        <section id="levelMenu" class="menu-screen" aria-label="Level Selection">
+            <h2 class="menu-title">Select Level</h2>
+            <div class="level-grid" role="group" aria-label="Difficulty levels from 1 to 10">
+                <button class="level-button" data-level="1" aria-label="Level 1">1</button>
+                <button class="level-button" data-level="2" aria-label="Level 2">2</button>
+                <button class="level-button" data-level="3" aria-label="Level 3">3</button>
+                <button class="level-button" data-level="4" aria-label="Level 4">4</button>
+                <button class="level-button" data-level="5" aria-label="Level 5">5</button>
+                <button class="level-button" data-level="6" aria-label="Level 6">6</button>
+                <button class="level-button" data-level="7" aria-label="Level 7">7</button>
+                <button class="level-button" data-level="8" aria-label="Level 8">8</button>
+                <button class="level-button" data-level="9" aria-label="Level 9">9</button>
+                <button class="level-button" data-level="10" aria-label="Level 10">10</button>
+            </div>
+            <button class="back-button" aria-label="Back to main menu">Back</button>
+        </section>
+
+        <!-- Settings Menu -->
+        <section id="settingsMenu" class="menu-screen" aria-label="Settings Menu">
+            <h2 class="menu-title">Settings</h2>
+            <div class="settings-group">
+                <h3 id="audioLabel">Audio</h3>
+                <div class="setting-options" role="radiogroup" aria-labelledby="audioLabel">
+                    <button class="setting-option audio-option active" data-value="on" role="radio" aria-checked="true">On</button>
+                    <button class="setting-option audio-option" data-value="off" role="radio" aria-checked="false">Off</button>
+                </div>
+            </div>
+            <div class="settings-group">
+                <h3 id="controlTypeLabel">Control Type</h3>
+                <div class="setting-options" role="radiogroup" aria-labelledby="controlTypeLabel">
+                    <button class="setting-option control-option active" data-value="mouse" role="radio" aria-checked="true">Mouse</button>
+                    <button class="setting-option control-option" data-value="keyboard" role="radio" aria-checked="false">Keyboard</button>
+                </div>
+            </div>
+            <div class="settings-group">
+                <h3 id="smoothPaddleLabel">Smooth Paddle</h3>
+                <div class="setting-options" role="radiogroup" aria-labelledby="smoothPaddleLabel">
+                    <button class="setting-option smoothing-option active" data-value="on" role="radio" aria-checked="true">On</button>
+                    <button class="setting-option smoothing-option" data-value="off" role="radio" aria-checked="false">Off</button>
+                </div>
+            </div>
+            <div class="settings-group">
+                <h3 id="languageLabel">Language</h3>
+                <div class="setting-options" role="radiogroup" aria-labelledby="languageLabel">
+                    <button class="setting-option language-option active" data-value="english" role="radio" aria-checked="true">English</button>
+                    <button class="setting-option language-option" data-value="georgian" role="radio" aria-checked="false">Georgian</button>
+                </div>
+            </div>
+            <button class="back-button" aria-label="Back to main menu">Back</button>
+        </section>
+
+        <!-- Game Screen -->
+        <section id="gameScreen" class="menu-screen" aria-label="Game Screen">
+            <header class="game-header">
+                <div id="levelDisplay" aria-live="polite">Level: 1</div>
+                <h2 class="game-title">PONG</h2>
+                <button id="menuButton" class="icon-button small" aria-label="Return to menu"><i class="fas fa-bars"></i></button>
+            </header>
+            <div class="score-labels">
+                <div id="playerLabel">YOU</div>
+                <div id="cpuLabel">CPU</div>
+            </div>
+            <div class="score" aria-live="polite">
+                <div id="playerScore" aria-label="Player score">0</div>
+                <div id="computerScore" aria-label="Computer score">0</div>
+            </div>
+            <canvas id="gameCanvas" aria-label="Pong game canvas. Use mouse to control the left paddle."></canvas>
+            <div class="button-container">
+                <button id="startButton" aria-label="Start or pause the game">Start</button>
+                <button class="icon-button" id="muteButton" aria-label="Toggle sound"><i class="fas fa-volume-up"></i></button>
+                <button class="icon-button" id="helpButton" aria-label="Show game controls"><i class="fas fa-question"></i></button>
+                <button class="icon-button" id="menuButton" aria-label="Return to main menu"><i class="fas fa-home"></i></button>
+            </div>
+            <div class="controls-info">
+                <p>Use <span class="key">W</span>/<span class="key">S</span> keys or <span class="key">↑</span>/<span class="key">↓</span> to move</p>
+            </div>
+            
+            <!-- Mobile touch controls -->
+            <div class="mobile-controls">
+                <button class="mobile-control-btn" id="upButton" aria-label="Move paddle up"><i class="fas fa-chevron-up"></i></button>
+                <button class="mobile-control-btn" id="downButton" aria-label="Move paddle down"><i class="fas fa-chevron-down"></i></button>
+            </div>
+        </section>
+    </main>
+    <script type="module" src="js/main.js"></script>
+</body>
+</html> 

@@ -1,0 +1,13 @@
+To complete the PWA functionality, you need to create two icon files:
+
+1. images/icon-192.png - A 192x192 pixel PNG icon
+2. images/icon-512.png - A 512x512 pixel PNG icon
+
+These should be created with the following specifications:
+- Format: PNG with transparency
+- Content: A simple pong-related icon (paddle and ball)
+- Background: Either transparent or #1a1a2e color
+- Foreground: White or #4cc9f0 color
+
+You can create these icons using any image editor or icon generator.
+Once created, the game will be fully ready to be installed on mobile devices. 
