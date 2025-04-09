@@ -21,8 +21,9 @@ if ('serviceWorker' in navigator) {
 // Initialize the game when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', () => {
     // Prevent elastic scrolling on iOS
-    document.body.addEventListener('touchmove', (e) => {
-        if (e.target.tagName !== 'CANVAS') {
+    document.addEventListener('touchmove', (e) => {
+        // If we're on a game screen, prevent scrolling
+        if (document.getElementById('gameScreen').classList.contains('active')) {
             e.preventDefault();
         }
     }, { passive: false });
@@ -36,9 +37,12 @@ document.addEventListener('DOMContentLoaded', () => {
     
     console.log('Initializing Pong game...');
     
-    // Initialize game components
+    // Get references to key elements
     const canvas = document.getElementById('gameCanvas');
     const uiController = new UIController();
+    
+    // We already imported the audioManager singleton instance
+    // No need to create a new instance with "new AudioManager()"
     
     // Apply iOS-specific fixes
     uiController.fixIOSHeight();
@@ -69,6 +73,12 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Initialize game
     const game = new Game(canvas, uiController, audioManager);
+    
+    // Set default control type based on device
+    // If it's a desktop device, default to keyboard controls
+    if (!game.isMobile()) {
+        game.setControlType('keyboard');
+    }
     
     // Handle window resize
     window.addEventListener('resize', () => resizeCanvas(game));

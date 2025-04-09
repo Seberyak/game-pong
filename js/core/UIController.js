@@ -174,16 +174,28 @@ export class UIController {
         // Settings options - Control Type
         document.querySelectorAll('.control-option').forEach(option => {
             option.addEventListener('click', () => {
-                document.querySelectorAll('.control-option').forEach(o => {
-                    o.classList.remove('active');
-                    o.setAttribute('aria-checked', 'false');
-                });
-                option.classList.add('active');
-                option.setAttribute('aria-checked', 'true');
+                // Get the control type value from the data attribute
+                const controlType = option.dataset.value;
                 
-                this.controlType = option.dataset.value;
-                if (typeof game.setControlType === 'function') {
-                    game.setControlType(this.controlType);
+                // Only proceed if the value is valid and different from current setting
+                if ((controlType === 'mouse' || controlType === 'keyboard') && 
+                    controlType !== game.controlType) {
+                    
+                    // Clear active class from all options
+                    document.querySelectorAll('.control-option').forEach(o => {
+                        o.classList.remove('active');
+                        o.setAttribute('aria-checked', 'false');
+                    });
+                    
+                    // Set active class on the selected option
+                    option.classList.add('active');
+                    option.setAttribute('aria-checked', 'true');
+                    
+                    // Update the game's control type
+                    game.setControlType(controlType);
+                    
+                    // Play a sound effect for feedback
+                    audioManager.playSound('ui');
                 }
             });
         });
@@ -390,9 +402,15 @@ export class UIController {
                 levelDisplay.textContent = `${text.level}: ${level}`;
             }
             
-            // Update control text elements if they exist
+            // Update control text elements based on current control type
             const controlsText = document.getElementById('controlsText');
-            if (controlsText) controlsText.textContent = text.controlsText;
+            if (controlsText) {
+                if (this.controlType === 'mouse') {
+                    controlsText.textContent = text.controlsText;
+                } else if (this.controlType === 'keyboard') {
+                    controlsText.textContent = text.keyboardControlsText || "Use arrow keys to move paddle";
+                }
+            }
             
             const winConditionText = document.getElementById('winConditionText');
             if (winConditionText) winConditionText.textContent = text.winConditionText;
@@ -403,12 +421,54 @@ export class UIController {
                 smoothPaddleLabel.textContent = text.smoothPaddle;
             }
             
+            const audioLabel = document.getElementById('audioLabel');
+            if (audioLabel) {
+                audioLabel.textContent = text.audio;
+            }
+            
+            const controlTypeLabel = document.getElementById('controlTypeLabel');
+            if (controlTypeLabel) {
+                controlTypeLabel.textContent = text.controlType;
+            }
+            
+            const languageLabel = document.getElementById('languageLabel');
+            if (languageLabel) {
+                languageLabel.textContent = text.language || 'Language';
+            }
+            
+            // Update menu titles
+            const settingsTitle = document.querySelector('#settingsMenu .menu-title');
+            if (settingsTitle) {
+                settingsTitle.textContent = text.settings;
+            }
+            
+            const levelMenuTitle = document.querySelector('#levelMenu .menu-title');
+            if (levelMenuTitle) {
+                levelMenuTitle.textContent = text.selectLevel;
+            }
+            
             // Update setting option text
             document.querySelectorAll('.smoothing-option').forEach(option => {
                 if (option.dataset.value === 'on') {
                     option.textContent = text.on;
                 } else {
                     option.textContent = text.off;
+                }
+            });
+            
+            document.querySelectorAll('.audio-option').forEach(option => {
+                if (option.dataset.value === 'on') {
+                    option.textContent = text.on;
+                } else {
+                    option.textContent = text.off;
+                }
+            });
+            
+            document.querySelectorAll('.control-option').forEach(option => {
+                if (option.dataset.value === 'mouse') {
+                    option.textContent = text.mouse;
+                } else if (option.dataset.value === 'keyboard') {
+                    option.textContent = text.keyboard;
                 }
             });
             
@@ -426,9 +486,12 @@ export class UIController {
             const startMenuBtn = document.getElementById('startMenuBtn');
             if (startMenuBtn) startMenuBtn.textContent = text.startGame;
             
+            const settingsMenuBtn = document.getElementById('settingsMenuBtn');
+            if (settingsMenuBtn) settingsMenuBtn.textContent = text.settings;
+            
             // Update back buttons
             document.querySelectorAll('.back-button').forEach(button => {
-                button.textContent = 'Back';
+                button.textContent = text.back || 'Back';
             });
         } catch (error) {
             console.warn('Error updating language text:', error);

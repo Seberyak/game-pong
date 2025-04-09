@@ -80,7 +80,7 @@ export class Game {
                 this.audioManager.initAudioContext();
             }
             
-            // Always use mouse for paddle control when controlType is mouse, even when not running yet
+            // Only use mouse for paddle control when controlType is mouse and not on mobile
             if (this.controlType === 'mouse' && !this.isMobile()) {
                 const rect = this.canvas.getBoundingClientRect();
                 const mouseY = e.clientY - rect.top;
@@ -112,25 +112,29 @@ export class Game {
                 this.audioManager.initAudioContext();
             }
             
-            const rect = this.canvas.getBoundingClientRect();
-            const touchY = e.touches[0].clientY - rect.top;
-            
-            // Calculate and clamp paddle position
-            let paddlePosition = touchY - (this.player.height / 2);
-            paddlePosition = Math.max(0, Math.min(this.height - this.player.height, paddlePosition));
-            
-            // Update player target position for smooth movement
-            this.player.targetY = paddlePosition;
-            
-            // If game is not running yet, still update paddle position for visual feedback
-            if (!this.isRunning) {
-                this.player.y = this.player.targetY;
-                this.draw();
+            // Only process touch events if on mobile or control type is mouse
+            if (this.isMobile() || this.controlType === 'mouse') {
+                const rect = this.canvas.getBoundingClientRect();
+                const touchY = e.touches[0].clientY - rect.top;
+                
+                // Calculate and clamp paddle position
+                let paddlePosition = touchY - (this.player.height / 2);
+                paddlePosition = Math.max(0, Math.min(this.height - this.player.height, paddlePosition));
+                
+                // Update player target position for smooth movement
+                this.player.targetY = paddlePosition;
+                
+                // If game is not running yet, still update paddle position for visual feedback
+                if (!this.isRunning) {
+                    this.player.y = this.player.targetY;
+                    this.draw();
+                }
             }
         }, { passive: false });
         
         // Document-wide mouse tracking
         document.addEventListener('mousemove', (e) => {
+            // Only process mouse movement if control type is mouse and not on mobile
             if (this.controlType !== 'mouse' || this.isMobile()) return;
             
             const rect = this.canvas.getBoundingClientRect();
@@ -727,6 +731,36 @@ export class Game {
                 e.preventDefault();
                 this.player.isMovingDown = false;
             });
+            
+            // Also add mouse events for desktop testing of mobile controls
+            upButton.addEventListener('mousedown', () => {
+                this.player.isMovingUp = true;
+            });
+            
+            upButton.addEventListener('mouseup', () => {
+                this.player.isMovingUp = false;
+            });
+            
+            downButton.addEventListener('mousedown', () => {
+                this.player.isMovingDown = true;
+            });
+            
+            downButton.addEventListener('mouseup', () => {
+                this.player.isMovingDown = false;
+            });
+            
+            // Handle mouse leaving the button while pressed
+            upButton.addEventListener('mouseleave', () => {
+                if (this.player.isMovingUp) {
+                    this.player.isMovingUp = false;
+                }
+            });
+            
+            downButton.addEventListener('mouseleave', () => {
+                if (this.player.isMovingDown) {
+                    this.player.isMovingDown = false;
+                }
+            });
         }
         
         // Set control type display based on device
@@ -749,9 +783,17 @@ export class Game {
                 controlsInfo.style.display = 'none';
             }
             
+            // Show mobile control buttons
+            const mobileControls = document.querySelector('.mobile-controls');
+            if (mobileControls) {
+                mobileControls.style.display = 'flex';
+            }
+            
             // Hide control type options in settings
             controlOptions.forEach(option => {
-                option.parentElement.parentElement.style.display = 'none';
+                if (option.parentElement && option.parentElement.parentElement) {
+                    option.parentElement.parentElement.style.display = 'none';
+                }
             });
         } else {
             // On desktop, show the appropriate control info text based on selected control type
@@ -759,17 +801,37 @@ export class Game {
                 controlsInfo.style.display = 'flex';
             }
             
+            // Hide mobile controls on desktop
+            const mobileControls = document.querySelector('.mobile-controls');
+            if (mobileControls) {
+                mobileControls.style.display = 'none';
+            }
+            
             if (controlText) {
+                const langText = translations[this.language] || translations.english;
                 if (this.controlType === 'mouse') {
-                    controlText.innerHTML = 'Use <span class="key">mouse</span> to move paddle';
+                    // Use the translation for mouse controls with better structure
+                    controlText.innerHTML = `<span class="key">${langText.mouse || 'Mouse'}</span> ${langText.controlsText}`;
                 } else {
-                    controlText.innerHTML = 'Use <span class="key">W</span>/<span class="key">S</span> keys or <span class="key">↑</span>/<span class="key">↓</span> to move';
+                    // Use the translation for keyboard controls directly
+                    controlText.innerHTML = langText.keyboardControlsText;
                 }
             }
             
             // Show control type options in settings
             controlOptions.forEach(option => {
-                option.parentElement.parentElement.style.display = 'block';
+                if (option.parentElement && option.parentElement.parentElement) {
+                    option.parentElement.parentElement.style.display = 'block';
+                }
+                
+                // Set active state based on current control type
+                if (option.dataset.value === this.controlType) {
+                    option.classList.add('active');
+                    option.setAttribute('aria-checked', 'true');
+                } else {
+                    option.classList.remove('active');
+                    option.setAttribute('aria-checked', 'false');
+                }
             });
         }
     }
@@ -842,23 +904,54 @@ export class Game {
         if (type === 'mouse' || type === 'keyboard') {
             this.controlType = type;
             
+            // Reset paddle movement flags when changing control type
+            this.player.isMovingUp = false;
+            this.player.isMovingDown = false;
+            
+            // For keyboard control, reset target position to current position
+            if (type === 'keyboard') {
+                this.player.targetY = this.player.y;
+            }
+            
             // Update the control info text
             const controlsInfo = document.querySelector('.controls-info p');
             if (controlsInfo) {
+                const langText = translations[this.language] || translations.english;
                 if (type === 'mouse') {
-                    controlsInfo.innerHTML = 'Use <span class="key">mouse</span> to move paddle';
+                    // Use the translation for mouse controls with better structure
+                    controlsInfo.innerHTML = `<span class="key">${langText.mouse || 'Mouse'}</span> ${langText.controlsText}`;
                 } else {
-                    controlsInfo.innerHTML = 'Use <span class="key">W</span>/<span class="key">S</span> keys or <span class="key">↑</span>/<span class="key">↓</span> to move';
+                    // Use the translation for keyboard controls directly
+                    controlsInfo.innerHTML = langText.keyboardControlsText;
                 }
             }
             
             // Update canvas aria-label for accessibility
             const canvas = document.getElementById('gameCanvas');
             if (canvas) {
+                const langText = translations[this.language] || translations.english;
                 if (type === 'mouse') {
-                    canvas.setAttribute('aria-label', 'Pong game canvas. Use mouse to control the left paddle.');
+                    canvas.setAttribute('aria-label', `Pong game canvas. ${langText.controlsText}`);
                 } else {
-                    canvas.setAttribute('aria-label', 'Pong game canvas. Use W/S or arrow keys to control the left paddle.');
+                    canvas.setAttribute('aria-label', `Pong game canvas. ${langText.keyboardControlsText}`);
+                }
+            }
+            
+            // Update control options in settings menu
+            const mouseControl = document.querySelector('.control-option[data-value="mouse"]');
+            const keyboardControl = document.querySelector('.control-option[data-value="keyboard"]');
+            
+            if (mouseControl && keyboardControl) {
+                if (type === 'mouse') {
+                    mouseControl.classList.add('active');
+                    mouseControl.setAttribute('aria-checked', 'true');
+                    keyboardControl.classList.remove('active');
+                    keyboardControl.setAttribute('aria-checked', 'false');
+                } else {
+                    keyboardControl.classList.add('active');
+                    keyboardControl.setAttribute('aria-checked', 'true');
+                    mouseControl.classList.remove('active');
+                    mouseControl.setAttribute('aria-checked', 'false');
                 }
             }
             

@@ -245,6 +245,13 @@ body {
     gap: 10px;
 }
 
+.language-options {
+    flex-wrap: wrap;
+    max-width: 300px;
+    gap: 8px;
+    margin: 0 auto 15px;
+}
+
 .setting-option {
     padding: 8px 16px;
     background: rgba(33, 150, 243, 0.3);
@@ -683,28 +690,34 @@ html, body {
 .mobile-controls {
     display: none;
     width: 100%;
-    padding: 10px 0;
-    justify-content: space-between;
+    padding: 15px 0;
+    justify-content: space-around;
     align-items: center;
-    margin-top: 10px;
+    margin: 15px 0;
+    z-index: 100;
+    position: relative;
 }
 
 .mobile-control-btn {
-    width: 65px;
-    height: 65px;
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
-    background-color: rgba(255, 255, 255, 0.2);
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.2), rgba(255, 87, 34, 0.6));
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 24px;
+    font-size: 28px;
     color: white;
-    border: none;
+    border: 2px solid rgba(255, 255, 255, 0.4);
     outline: none;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    transition: transform 0.1s, background 0.2s;
 }
 
 .mobile-control-btn:active {
-    background-color: rgba(255, 255, 255, 0.4);
+    transform: scale(0.95);
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.3), rgba(255, 87, 34, 0.8));
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
 @media (max-width: 768px) {
@@ -713,35 +726,22 @@ html, body {
     }
     
     .controls-info {
-        display: none;
+        display: none !important;
     }
     
     .game-container {
-        padding-bottom: 80px;
+        padding-bottom: 90px;
     }
     
     canvas {
         touch-action: none;
     }
     
-    /* Mobile-specific title styling that works better across devices */
-    .game-title {
-        font-family: 'Press Start 2P', cursive;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-        text-rendering: optimizeLegibility;
-        /* Simpler styling for mobile that still looks good */
-        background: none;
-        -webkit-background-clip: initial;
-        background-clip: initial;
-        -webkit-text-fill-color: white;
-        text-shadow: 
-            0 0 10px #FF5722,
-            0 0 20px #FFC107,
-            0 0 30px #8BC34A,
-            0 0 40px #2196F3,
-            0 0 50px #9C27B0;
-        letter-spacing: 4px;
+    /* Make sure mobile controls are always visible during gameplay */
+    #gameScreen.active .mobile-controls {
+        display: flex !important;
+        position: relative;
+        z-index: 101;
     }
 }
 

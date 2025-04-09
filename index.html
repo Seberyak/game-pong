@@ -58,8 +58,8 @@
             <div class="settings-group">
                 <h3 id="controlTypeLabel">Control Type</h3>
                 <div class="setting-options" role="radiogroup" aria-labelledby="controlTypeLabel">
-                    <button class="setting-option control-option active" data-value="mouse" role="radio" aria-checked="true">Mouse</button>
-                    <button class="setting-option control-option" data-value="keyboard" role="radio" aria-checked="false">Keyboard</button>
+                    <button class="setting-option control-option" data-value="mouse" role="radio" aria-checked="false">Mouse</button>
+                    <button class="setting-option control-option active" data-value="keyboard" role="radio" aria-checked="true">Keyboard</button>
                 </div>
             </div>
             <div class="settings-group">
@@ -71,9 +71,14 @@
             </div>
             <div class="settings-group">
                 <h3 id="languageLabel">Language</h3>
-                <div class="setting-options" role="radiogroup" aria-labelledby="languageLabel">
+                <div class="setting-options language-options" role="radiogroup" aria-labelledby="languageLabel">
                     <button class="setting-option language-option active" data-value="english" role="radio" aria-checked="true">English</button>
                     <button class="setting-option language-option" data-value="georgian" role="radio" aria-checked="false">Georgian</button>
+                    <button class="setting-option language-option" data-value="french" role="radio" aria-checked="false">Français</button>
+                    <button class="setting-option language-option" data-value="spanish" role="radio" aria-checked="false">Español</button>
+                    <button class="setting-option language-option" data-value="german" role="radio" aria-checked="false">Deutsch</button>
+                    <button class="setting-option language-option" data-value="japanese" role="radio" aria-checked="false">日本語</button>
+                    <button class="setting-option language-option" data-value="russian" role="radio" aria-checked="false">Русский</button>
                 </div>
             </div>
             <button class="back-button" aria-label="Back to main menu">Back</button>
@@ -94,7 +99,7 @@
                 <div id="playerScore" aria-label="Player score">0</div>
                 <div id="computerScore" aria-label="Computer score">0</div>
             </div>
-            <canvas id="gameCanvas" aria-label="Pong game canvas. Use mouse to control the left paddle."></canvas>
+            <canvas id="gameCanvas" aria-label="Pong game canvas. Use W/S or arrow keys to control the left paddle."></canvas>
             <div class="button-container">
                 <button id="startButton" aria-label="Start or pause the game">Start</button>
                 <button class="icon-button" id="muteButton" aria-label="Toggle sound"><i class="fas fa-volume-up"></i></button>

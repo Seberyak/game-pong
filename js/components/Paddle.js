@@ -70,6 +70,7 @@ export class Paddle {
         // This prevents paddle from resetting when keys are released
         if (moved) {
             this.targetY = this.y;
+            return; // Exit early to give priority to keyboard controls
         }
         // Only apply mouse-based positioning if we haven't moved with keyboard
         else if (this.targetY !== undefined) {
